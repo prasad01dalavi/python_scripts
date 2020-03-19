@@ -1,0 +1,55 @@
+1. Please write a python code to fulfil the below requirement.
+=============================================================
+
+In a Linux system we have 3 log files 'log1', 'log2', 'log3' which keeps the client session logs in below format:
+
+
+Jan 23 2016 10:30:08AM - bla bla HOST-1A connected
+Jan 23 2016 11:04:56AM - bla bla HOST-1B connected
+Jan 23 2016 1:18:32PM - bla bla HOST-1B disconnected from server
+Jan 23 2016 4:16:09PM - bla bla spurious activity from 10.0.0.45
+Jan 23 2016 9:43:44PM - bla bla HOST-1A disconnected from server
+Feb 1 2016 12:40:28AM - bla bla HOST-1A connected
+Feb 1 2016 1:21:52AM - bla bla spurious activity from 192.168.123.4
+Mar 29 2016 1:13:07PM - bla bla HOST-1A disconnected from server
+
+
+You have to ssh into the system, parse the logs and save it in your local system in below format:
+
+
+HOST-1A - connected at 23/01/2016 10:30:08 and disconnected at 23/01/2016 21:43:44
+
+HOST-1B - connected at 23/01/2016 11:04:56 and disconnected at 23/01/2016 13:18:32
+
+HOST-1A - connected at 01/02/2016 12:40:28 and disconnected at 29/03/2016 13:13:07
+
+Spurious activities from: 10.0.0.45, 192.168.123.4
+
+
+2. Write a code in python to run two coroutine concurrently for infinite time.
+   1st coroutine will print number starting from 0.
+   2nd coroutine will print the duration after each 3 seconds.
+
+   output should be something like this.
+   -------------------------------------
+   0 seconds have passed
+   1
+   2
+   3
+   4
+   5
+   6
+   3 seconds have passed
+   7
+   8
+   9
+   10
+   11
+   12
+   6 seconds have passed
+
+
+3. Do a get request on the url(http://dummy.restapiexample.com/api/v1/employees) and prepare a report in excel.
+
+   Format:
+   id  employee_name  employee_salary  employee_age  profile_image
