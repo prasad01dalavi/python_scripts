@@ -25,7 +25,6 @@ HOST-1A - connected at 01/02/2016 12:40:28 and disconnected at 29/03/2016 13:13:
 
 Spurious activities from: 10.0.0.45, 192.168.123.4
 
-
 2. Write a code in python to run two coroutine concurrently for infinite time.
    1st coroutine will print number starting from 0.
    2nd coroutine will print the duration after each 3 seconds.

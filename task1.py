@@ -1,18 +1,11 @@
 import dateparser
 import spur
 
+REMOTE_HOST = "<Server IP>"
 
 shell = spur.SshShell(hostname=REMOTE_HOST,
-                      username="<server_ip>",
-                      password="<server_password>")
-
-log1 = shell.run(["cat", "log_files/log1"])
-log1_data = log1.output.decode("utf-8")
-log1_records = log1_data.split("\n")
-timings = []
-connection_list = []
-disconnection_list = []
-spurious_list = []
+                      username="<username>",
+                      password="<password>")
 
 
 def get_disconnection_record(host_name):
@@ -38,52 +31,72 @@ def get_disconnection_record(host_name):
             return disconnection_date, disconnection_time
 
 
-for record in log1_records:
-    timing = record.split(" - ")[0]
-    word_tokens = record.split(" - ")[1].split(" ")
+def parse_logs(log_records, log_file_name):
+    for record in log_records:
+        timing = record.split(" - ")[0]
+        word_tokens = record.split(" - ")[1].split(" ")
 
-    if 'connected' in word_tokens:
-        connection_list.append({
+        if 'connected' in word_tokens:
+            connection_list.append({
+                timing: record.split(" - ")[1]
+            })
+            continue
+
+        if 'disconnected' in word_tokens:
+            disconnection_list.append({
+                timing: record.split(" - ")[1]
+            })
+            continue
+
+        spurious_list.append({
             timing: record.split(" - ")[1]
         })
-        continue
 
-    if 'disconnected' in word_tokens:
-        disconnection_list.append({
-            timing: record.split(" - ")[1]
-        })
-        continue
+    for connection in connection_list:
+        connection_timing = connection.keys()
+        connection_timing = dateparser.parse(list(connection_timing)[0])
+        connection_time = str(connection_timing).split(" ")[1]
+        connection_date = \
+            str(connection_timing).split(" ")[0].split("-")
+        connection_date = \
+            f'{connection_date[2]}/{connection_date[1]}/{connection_date[0]}'
 
-    spurious_list.append({
-        timing: record.split(" - ")[1]
-    })
+        connection_data = connection.values()
+        host_name = list(connection_data)[0].split(" ")[-2]
+        # Now look for disconnection of this server
+        disconnection_date, disconnection_time = \
+            get_disconnection_record(host_name)
+
+        connectivity_logs = \
+            f'{host_name} - connected at {connection_date} '\
+            f'{connection_time} and disconnected at {disconnection_date} '\
+            f'{disconnection_time}\n\n'
+        with open(f"parsed_logs/{log_file_name}", "a") as f:
+            f.write(connectivity_logs)
+
+    spurious_host_list = []
+
+    for spurious in spurious_list:
+        spurious_data = list(spurious.values())[0]
+        spurious_host = spurious_data.split(" ")[-1]
+        spurious_host_list.append(spurious_host)
+
+    spurious_hosts = ', '.join(spurious_host_list)
+    spurious_logs = f'Spurious activities from: {spurious_hosts}\n\n'
+
+    with open(f"parsed_logs/{log_file_name}", "a") as f:
+        f.write(spurious_logs)
 
 
-for connection in connection_list:
-    connection_timing = connection.keys()
-    connection_timing = dateparser.parse(list(connection_timing)[0])
-    connection_time = str(connection_timing).split(" ")[1]
-    connection_date = \
-        str(connection_timing).split(" ")[0].split("-")
-    connection_date = \
-        f'{connection_date[2]}/{connection_date[1]}/{connection_date[0]}'
+for log_file_number in range(1, 4):
+    log_file_name = f'log{log_file_number}'
+    log = shell.run(["cat", f"log_files/{log_file_name}"])
+    log_data = log.output.decode("utf-8")
+    log_records = log_data.split("\n")
 
-    connection_data = connection.values()
-    host_name = list(connection_data)[0].split(" ")[-2]
-    # Now look for disconnection of this server
-    disconnection_date, disconnection_time = \
-        get_disconnection_record(host_name)
-
-    print(f'{host_name} - connected at {connection_date} '\
-         f'{connection_time} and disconnected at {disconnection_date} '\
-         f'{disconnection_time}\n')
-
-spurious_host_list = []
-
-for spurious in spurious_list:
-    spurious_data = list(spurious.values())[0]
-    spurious_host = spurious_data.split(" ")[-1]
-    spurious_host_list.append(spurious_host)
-
-spurious_hosts = ', '.join(spurious_host_list)
-print(f'Spurious activities from: {spurious_hosts}\n')
+    timings = []
+    connection_list = []
+    disconnection_list = []
+    spurious_list = []
+    print(f'[INFO] Parsing log: {log_file_name}')
+    parse_logs(log_records, log_file_name)
