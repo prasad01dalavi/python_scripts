@@ -31,8 +31,16 @@ url = "http://dummy.restapiexample.com/api/v1/employees"
 employee_records = requests.get(url).json()['data']
 
 record_list = [['id', 'employee_name', 'employee_salary', 'employee_age',
-                'profile_image']]
+                'profile_image'
+                ]]
 for employee_record in employee_records:
+    print([
+        employee_record['id'],
+        employee_record['employee_name'],
+        employee_record['employee_salary'],
+        employee_record['employee_age'],
+        employee_record['profile_image']
+    ])
     record_list.append([
         employee_record['id'],
         employee_record['employee_name'],

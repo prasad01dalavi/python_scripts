@@ -1,11 +1,11 @@
 import dateparser
 import spur
 
-REMOTE_HOST = "<Server IP>"
+REMOTE_HOST = "192.168.0.101"
 
 shell = spur.SshShell(hostname=REMOTE_HOST,
-                      username="<username>",
-                      password="<password>")
+                      username="prasad",
+                      password="betheone")
 
 
 def get_disconnection_record(host_name):
@@ -89,7 +89,7 @@ def parse_logs(log_records, log_file_name):
 
 
 for log_file_number in range(1, 4):
-    log_file_name = f'log{log_file_number}'
+    log_file_name = f'log{log_file_number}'  # log1
     log = shell.run(["cat", f"log_files/{log_file_name}"])
     log_data = log.output.decode("utf-8")
     log_records = log_data.split("\n")
